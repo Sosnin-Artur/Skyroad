@@ -11,8 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float verticalSpeedBoost = 2.0f;    
 
     [SerializeField] Rigidbody rb;
-    [SerializeField] GameManager gameManager;
-
+            
     private float _speedModifier = 1.0f;
     private Vector2 _touchLastPos;
     private float _sidewaysSpeed;
@@ -42,13 +41,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _speedModifier = verticalSpeedBoost;
-            gameManager.Boost(verticalSpeedBoost);
+            GameManager.instance.Boost(verticalSpeedBoost);
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
             _speedModifier = 1.0f;
-            gameManager.Boost(1.0f);
+            GameManager.instance.Boost(1.0f);
         }
 
         rb.velocity = new Vector3(0, 0, verticalSpeed * _speedModifier);
@@ -62,7 +61,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Obstacle"))
         {
-            gameManager.AddLives(-1);
+            GameManager.instance.AddLives(-1);
         }    
     }
 
@@ -70,8 +69,8 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("ScoreLine"))
         {   
-            gameManager.AddScore(5);         
-            gameManager.AddAsteroid(1);
+            GameManager.instance.AddScore(5);         
+            GameManager.instance.AddAsteroid(1);
         }
         else if (other.CompareTag("Crystal"))
         {

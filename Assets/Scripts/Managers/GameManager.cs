@@ -11,14 +11,9 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private int lives = 1;    
 
-    [SerializeField] private Text timeText;
-    [SerializeField] private Text hightTimeText;
+    
     [SerializeField] private TMP_Text scoreText;
-    [SerializeField] private Text hightScoreText;
-    [SerializeField] private Text asteroidsCountText;
-    [SerializeField] private Text hightAsteroidsCountText;
-
-    [SerializeField] private GameObject hints;
+    
     [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private GameObject mainMenu;
 
@@ -35,13 +30,26 @@ public class GameManager : MonoBehaviour
 
     private bool _isGameStarted = false;
     public GameObject _canvas;
+    
+    public static GameManager instance;
 
     private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+
+            DontDestroyOnLoad(this);
+            // DontDestroyOnLoad(this);
+            //DontDestroyOnLoad(this);
+        }
+        else if (instance != null)
+        {
+            Debug.Log("Instance already exists, destroying object!");
+            Destroy(this.gameObject);
+        }
+
         LoadData();
-        hightScoreText.text =  "Hight Score: " + _hightScore.ToString();        
-        hightTimeText.text =  "Best time : " + _hightTime.ToString();        
-        hightAsteroidsCountText.text = "Best asteroids: " + _hightActeroidsCount.ToString();
     }    
 
     private void Start()
@@ -51,7 +59,6 @@ public class GameManager : MonoBehaviour
         //hints.SetActive(true);
         mainMenu.SetActive(true);
         gameOverMenu.SetActive(false);
-        timeText.text = "";
     }
     
     private void Update()
@@ -69,13 +76,13 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log("Start game");
         _score = 0;
         scoreText.text = "0";
         _canvas.SetActive(false);
         mainMenu.SetActive(false);
         _isGameStarted = true;
         Time.timeScale = 1;
-        hints.SetActive(false);
         StartCoroutine(Timer());
     }
 
@@ -103,9 +110,7 @@ public class GameManager : MonoBehaviour
             if (_time > _hightTime)
             {
                 _hightTime = _time;                
-                hightTimeText.text =  "Best time : " + _hightTime.ToString();     
-            }
-            timeText.text = _time.ToString();            
+            }        
         }                             
     }
 
@@ -154,7 +159,6 @@ public class GameManager : MonoBehaviour
         if (_score > _hightScore)
         {
             _hightScore = _score;
-            hightScoreText.text =  "Hight Score: " + _hightScore.ToString();
         }
         scoreText.text = _score.ToString();
     }
@@ -165,9 +169,7 @@ public class GameManager : MonoBehaviour
         if (_asteroidsCount > _hightActeroidsCount)
         {
             _hightActeroidsCount = _asteroidsCount;
-            hightAsteroidsCountText.text = "Best asteroids: " + _hightActeroidsCount.ToString();
         }
-        asteroidsCountText.text = "Asteroids: " + _asteroidsCount.ToString();
     }
     
     public void AddLives(int value)
@@ -183,7 +185,12 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         Time.timeScale = 1;
+        gameOverMenu.SetActive(false);
+        mainMenu.SetActive(true);
+        _canvas.SetActive(true);
+
         SceneManager.LoadScene("Game");
+
     }    
 
     public void Boost(float boost)

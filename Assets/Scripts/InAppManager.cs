@@ -21,7 +21,7 @@ namespace IAP
         public const string lightBlueShip = "lightBlueShip";
         public const string goldShip = "goldShip";
 
-        public const string greenShigp = "greenShipgp";
+        public const string greenShipgp = "greenShipgp";
         public const string redShipgp = "redShipgp";
         public const string blueShipgp = "blueShipgp";
         public const string purpleShipgp = "purpleShipgp";
@@ -56,7 +56,7 @@ namespace IAP
                 Destroy(this);
             }
         }
-            void Start()
+        void Start()
         {
             if (m_StoreController == null)
             {
@@ -70,11 +70,13 @@ namespace IAP
         {
             if (IsInitialized())
             {
-                return;
+                //return;
             }
 
+            Debug.Log("init purchsding");
+
             var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());            
-            builder.AddProduct(greenShip, ProductType.NonConsumable, new IDs() { { greenShigp, GooglePlay.Name } });
+            builder.AddProduct(greenShip, ProductType.NonConsumable, new IDs() { { greenShipgp, GooglePlay.Name } });
             builder.AddProduct(redShip, ProductType.NonConsumable, new IDs() { { redShipgp, GooglePlay.Name } });
             builder.AddProduct(blueShip, ProductType.NonConsumable, new IDs() { { blueShipgp, GooglePlay.Name } });
             builder.AddProduct(purpleShip, ProductType.NonConsumable, new IDs() { { purpleShipgp, GooglePlay.Name } });
@@ -170,7 +172,11 @@ namespace IAP
 
         public void ProcessPurchase(PurchaseItem item)   
         {
+            StartCoroutine(FirebaseManager.instance.AddTransaction(item.ID));
+
             var args = item.ID;
+            _ship = GameObject.Find("Spaceship").GetComponent<SpaceshipController>();
+            _planetRenderer = GameObject.Find("Planet").GetComponent<Renderer>();
 
             Debug.Log(string.Format("ProcessPurchase: PASS. Product: '{0}'", args));
             if (String.Equals(args, greenShip, StringComparison.Ordinal))

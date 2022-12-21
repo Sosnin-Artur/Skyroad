@@ -97,6 +97,7 @@ public class LevelController : MonoBehaviour
                 Vector3 pos = new Vector3(posInCircle.x + _prevPlane.transform.position.x, 1, posInCircle.y + _prevPlane.transform.position.z);
                 var crist = Instantiate(cristalPrefab);
                 crist.transform.position = pos;
+                Destroy(crist, 100);
                 //_placedObstacles.Add(obstacle);
             }
             else

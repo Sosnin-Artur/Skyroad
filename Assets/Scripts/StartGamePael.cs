@@ -12,7 +12,8 @@ public class StartGamePael : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        _manager.StartGame();
+      
+        GameManager.instance.StartGame();
     }
 
 }

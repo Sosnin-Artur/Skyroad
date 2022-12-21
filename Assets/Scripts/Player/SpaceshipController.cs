@@ -19,6 +19,7 @@ public class SpaceshipController : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 0;
         transform.localRotation = Quaternion.identity;
     }
 

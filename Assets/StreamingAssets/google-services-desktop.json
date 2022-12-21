@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "341038980845",
+    "firebase_url": "https://sky-road-18aec-default-rtdb.firebaseio.com",
+    "project_id": "sky-road-18aec",
+    "storage_bucket": "sky-road-18aec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341038980845:android:e85af28aa3d636336e76e4",
+        "android_client_info": {
+          "package_name": "com.mycomp.Scyroad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341038980845-en5qaft3dqbej4ulv670t72ftu5tgg82.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQdiu6GiyKrO7z6i0fvFTtdaAS0BDTfQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341038980845-en5qaft3dqbej4ulv670t72ftu5tgg82.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

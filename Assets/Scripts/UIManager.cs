@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,18 +15,27 @@ public class UIManager : MonoBehaviour
     public GameObject scoreboardUI;
 
     public GameObject canvas;
+    public GameObject mainMenu;
+    public GameObject ui;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+
+            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(scoreboardUI.gameObject);
+            DontDestroyOnLoad(ui.gameObject);
+           // DontDestroyOnLoad(this);
+            //DontDestroyOnLoad(this);
         }
         else if (instance != null)
         {
             Debug.Log("Instance already exists, destroying object!");
-            Destroy(this);
+            Destroy(this.gameObject);
         }
+
     }
 
     //Functions to change the login screen UI
@@ -64,5 +74,11 @@ public class UIManager : MonoBehaviour
     {
         ClearScreen();
         scoreboardUI.SetActive(true);
+    }
+
+    internal void OpenMainMenu()
+    {
+        ClearScreen();
+        mainMenu.SetActive(true);
     }
 }

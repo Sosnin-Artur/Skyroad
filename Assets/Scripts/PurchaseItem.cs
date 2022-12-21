@@ -10,6 +10,20 @@ public class PurchaseItem : MonoBehaviour
     public int productTypeId;
     public TMP_Text CostText;
 
+    private bool _complted;
+
+    public bool Complted
+    {
+        get => _complted;
+        set
+        {
+            if (value)
+            {
+                CostText.text = "sailed";
+            }
+        }                
+    }
+
     public void Start()
     {
         CostText.text = "$" + cost.ToString();

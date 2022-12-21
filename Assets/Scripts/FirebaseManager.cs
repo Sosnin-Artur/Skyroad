@@ -7,6 +7,7 @@ using TMPro;
 using System.Linq;
 using System.Collections.Generic;
 using IAP;
+using UnityEngine.SceneManagement;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -50,12 +51,15 @@ public class FirebaseManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+
+            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(scoreText.gameObject);
         }
         else if (instance != null)
         {
             Debug.Log("Instance already exists, destroying object!");
             //StartCoroutine(AddLog("Instance already exists, destroying object!"));
-            Destroy(this);
+            Destroy(this.gameObject);
         }
 
         //Check that all of the necessary dependencies for Firebase are present on the system
@@ -77,7 +81,7 @@ public class FirebaseManager : MonoBehaviour
         });
 
 
-        StartCoroutine(SetupPurchaseIttems());
+        //StartCoroutine(SetupPurchaseIttems());
     }
 
     private void InitializeFirebase()
@@ -98,12 +102,17 @@ public class FirebaseManager : MonoBehaviour
         }
         
         {
+            
             foreach (var item in InAppManager.instance.PurchaseItems)
             {
-                var DBItemTask = DBreference.Child("Products").Child(item.ID).Child("cost").SetValueAsync(item.cost);
-                DBreference.Child("Products").Child(item.ID).Child("product_type_id").SetValueAsync(item.productTypeId);
+                //foreach (var itemInDB in )
+                {
 
-                yield return new WaitUntil(predicate: () => DBItemTask.IsCompleted);
+                }
+                //var DBItemTask = DBreference.Child("Products").Child(item.ID).Child("cost").SetValueAsync(item.cost);
+                //DBreference.Child("Products").Child(item.ID).Child("product_type_id").SetValueAsync(item.productTypeId);
+
+                //yield return new WaitUntil(predicate: () => DBItemTask.IsCompleted);
 
                 //if (DBItemTask.Exception == null)
                 {
@@ -287,30 +296,19 @@ public class FirebaseManager : MonoBehaviour
             yield return null;
         }
 
-        var DBTask = DBreference.Child("Transactions").GetValueAsync();
+        var DBTask = DBreference.Child("Users").Child(User.UserId).Child("product_id").GetValueAsync();
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
         var count = DBTask.Result.ChildrenCount;
 
-        DBreference.Child("Transactions")
-            .Child((count).ToString())
+        DBreference.Child("Users")
+            .Child(User.UserId)
             .Child("product_id")
+            .Child(count.ToString())
             .SetValueAsync(productId);
 
-        var DBItemTask = DBreference.Child("Users").Child(User.UserId).Child("player_id").GetValueAsync();
-
-        yield return new WaitUntil(predicate: () => DBItemTask.IsCompleted);
-
-        DBreference.Child("Transactions")
-             .Child((count).ToString())
-             .Child("player_id")
-             .SetValueAsync(DBItemTask.Result);
-
-        DBreference.Child("Transactions")
-             .Child((count).ToString())
-             .Child("status_id")
-             .SetValueAsync(1);
+        
         //if (DBItemTask.Exception == null)
         {
             //DataSnapshot snapshot = DBItemTask.Result;
@@ -529,13 +527,23 @@ public class FirebaseManager : MonoBehaviour
             confirmLoginText.text = "Logged In";
             StartCoroutine(LoadUserData());
 
+            var DBTask = DBreference.Child("Users").Child(User.UserId).Child("product_id").OrderByKey().GetValueAsync();
+
+            yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+            //Debug.Log(DBTask.Result.GetType());
+
+            Debug.Log(((Dictionary<int, object>)(DBTask.Result.Value))[0]);
+
+            SceneManager.LoadScene("Game");
             yield return new WaitForSeconds(2);
 
-            usernameField.text = User.DisplayName;
-            UIManager.instance.UserDataScreen(); // Change to user data UI
-            confirmLoginText.text = "";
-            ClearLoginFeilds();
-            ClearRegisterFeilds();
+            //usernameField.text = User.DisplayName;
+            //UIManager.instance.UserDataScreen(); // Change to user data UI
+            //confirmLoginText.text = "";
+            //ClearLoginFeilds();
+            //ClearRegisterFeilds();
+            //UIManager.instance.OpenMainMenu();
         }
 
 
@@ -602,6 +610,7 @@ public class FirebaseManager : MonoBehaviour
                     //Wait until the task completes
                     yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
 
+
                     if (ProfileTask.Exception != null)
                     {
                         //If there are errors handle them
@@ -612,6 +621,8 @@ public class FirebaseManager : MonoBehaviour
                     {
                         //Username is now set
                         //Now return to login screen
+                        Debug.Log("suc");
+                        StartCoroutine(UpdateUsernameDatabase(_username));
                         UIManager.instance.LoginScreen();
                         warningRegisterText.text = "";
                         ClearRegisterFeilds();
@@ -644,8 +655,9 @@ public class FirebaseManager : MonoBehaviour
 
     private IEnumerator UpdateUsernameDatabase(string _username)
     {
+        Debug.Log(_username);
         //Set the currently logged in user username in the database
-        var DBTask = DBreference.Child("users").Child(User.UserId).Child("username").SetValueAsync(_username);
+        var DBTask = DBreference.Child("Users").Child(User.UserId).Child("username").SetValueAsync(_username);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -660,6 +672,7 @@ public class FirebaseManager : MonoBehaviour
     }
     private IEnumerator UpdateScore(int _xp)
     {
+        StartCoroutine(UpdateUsernameDatabase(User.DisplayName));
         var DBGetTask = DBreference.Child("Users").Child(User.UserId).GetValueAsync();
 
         yield return new WaitUntil(predicate: () => DBGetTask.IsCompleted);
@@ -699,6 +712,7 @@ public class FirebaseManager : MonoBehaviour
         }
         else if (DBTask.Result.Value == null || DBTask.Result.Child("score").Value == null)
         {
+            
             //No data exists yet
             scoreText.text = "0";
             
@@ -744,16 +758,20 @@ public class FirebaseManager : MonoBehaviour
             //Loop through every Users UID
             foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>())
             {
-                string username = childSnapshot.Child("username").Value.ToString();
-                int score = int.Parse(childSnapshot.Child("score").Value.ToString());
-                ind++;
-                //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(scoreElement, scoreboardContent);
-                scoreboardElement.GetComponent<ScoreElement>()
-                    .NewScoreElement(
-                    username,
-                    ind, 
-                    score);
+                if (childSnapshot.Child("score").Value is not null)
+                {
+                    string username = childSnapshot.Child("username").Value.ToString();
+                    int score = int.Parse(childSnapshot.Child("score").Value.ToString());
+                    ind++;
+                    //Instantiate new scoreboard elements
+                    GameObject scoreboardElement = Instantiate(scoreElement, scoreboardContent);
+                    scoreboardElement.GetComponent<ScoreElement>()
+                        .NewScoreElement(
+                        username,
+                        ind,
+                        score);
+                }
+                
             }
 
             //Go to scoareboard screen
