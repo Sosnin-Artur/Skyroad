@@ -527,13 +527,19 @@ public class FirebaseManager : MonoBehaviour
             confirmLoginText.text = "Logged In";
             StartCoroutine(LoadUserData());
 
-            var DBTask = DBreference.Child("Users").Child(User.UserId).Child("product_id").OrderByKey().GetValueAsync();
+            var DBTask = DBreference.Child("Users").Child(User.UserId).Child("product_id").GetValueAsync();
 
             yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
+            foreach (var item in DBTask.Result.Children)
+            {
+                var purch = InAppManager.instance.PurchaseItems.Find(i => item.Value.ToString() == i.ID);
+
+                purch.Complted = true;
+            }
             //Debug.Log(DBTask.Result.GetType());
 
-            Debug.Log(((Dictionary<int, object>)(DBTask.Result.Value))[0]);
+            Debug.Log(DBTask.Result.Value);
 
             SceneManager.LoadScene("Game");
             yield return new WaitForSeconds(2);

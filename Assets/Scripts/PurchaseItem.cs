@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,6 +18,7 @@ public class PurchaseItem : MonoBehaviour
         get => _complted;
         set
         {
+            _complted = value;
             if (value)
             {
                 CostText.text = "sailed";
@@ -24,8 +26,16 @@ public class PurchaseItem : MonoBehaviour
         }                
     }
 
-    public void Start()
+    public void Awake()
     {
-        CostText.text = "$" + cost.ToString();
+        if (_complted)
+        {
+            CostText.text = "sailed";
+        }
+        else
+        {
+
+            CostText.text = "$" + cost.ToString();
+        }
     }
 }
